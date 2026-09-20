@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wheee Crew Portal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ink:#1c2333; --paper:#faf6ee; --panel:#ffffff; --panel-2:#f3ede0;
+    --accent:#ff5a36; --accent-ink:#5c1c0c; --line:#d9d0bd; --muted:#7a6f5e;
+    --danger:#b23c22; --ok:#2f7d4f;
+    font-family:"IBM Plex Sans", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ink:#f1ece0; --paper:#14161c; --panel:#1d2028; --panel-2:#252832;
+      --accent:#ff7a52; --accent-ink:#2a0f06; --line:#33333a; --muted:#a89f8f;
+      --danger:#ff8a6b; --ok:#5fcf8a;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--paper); color:var(--ink); margin:0; padding-inline:16px; padding-block:0 40px;}
+  a{color:var(--accent);}
+
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding-block:18px; flex-wrap:wrap;
+    border-bottom:1px solid var(--line); margin-bottom:26px;
+  }
+  .brand{display:flex; flex-direction:column; gap:2px;}
+  .brand .word{font-family:"Fraunces", serif; font-weight:700; font-size:20px;}
+  .brand .tag{font-size:11.5px; color:var(--muted); letter-spacing:.04em;}
+  nav.tabs{display:flex; gap:6px; background:var(--panel-2); padding:4px; border-radius:10px;}
+  nav.tabs button{
+    font-family:inherit; font-size:13px; font-weight:600; color:var(--muted);
+    background:none; border:none; border-radius:7px; padding:8px 14px; cursor:pointer;
+  }
+  nav.tabs button.active{background:var(--panel); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.08);}
+
+  main{max-width:640px; margin:0 auto;}
+  main.wide{max-width:1000px;}
+
+  .eyebrow{font-size:12px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--accent);}
+  h1{font-family:"Fraunces", serif; font-weight:600; font-size:clamp(24px,5.5vw,30px); line-height:1.15; margin:6px 0 8px;}
+  p.lede{margin:0 0 22px; color:var(--muted); font-size:14.5px; line-height:1.55;}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; margin-bottom:18px;}
+  .card h2{font-family:"Fraunces", serif; font-size:17px; font-weight:600; margin:0 0 4px;}
+  .card .sub{font-size:12.5px; color:var(--muted); margin:0 0 16px;}
+
+  label{display:block; font-size:12.5px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;}
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  input[type="text"], input[type="tel"], input[type="email"], textarea, select{
+    width:100%; font-family:inherit; font-size:15px; color:var(--ink);
+    background:var(--paper); border:1.5px solid var(--line); border-radius:8px;
+    padding:10px 12px; outline:none; transition:border-color .15s ease;
+  }
+  textarea{resize:vertical; min-height:72px;}
+  input:focus, textarea:focus, select:focus{border-color:var(--accent);}
+  .req{color:var(--accent);}
+  .check-grid{display:flex; flex-wrap:wrap; gap:8px;}
+  .check-pill{display:flex; align-items:center; gap:6px; border:1.5px solid var(--line); border-radius:20px; padding:7px 13px; font-size:13.5px; cursor:pointer; user-select:none;}
+  .check-pill input{accent-color:var(--accent);}
+  .check-pill.checked{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 10%, var(--panel));}
+  .err-msg{font-size:12.5px; color:var(--danger); margin-top:6px; display:none;}
+  .field.invalid .err-msg{display:block;}
+  .field.invalid input, .field.invalid select, .field.invalid textarea{border-color:var(--danger);}
+
+  .agreement-box{max-height:220px; overflow-y:auto; white-space:pre-wrap; font-size:13.5px; line-height:1.6; background:var(--paper); border:1.5px solid var(--line); border-radius:10px; padding:14px 16px;}
+  .placeholder-flag{display:flex; gap:8px; font-size:12.5px; color:var(--danger); background:color-mix(in srgb, var(--danger) 10%, var(--panel)); border:1px solid color-mix(in srgb, var(--danger) 35%, var(--line)); border-radius:8px; padding:9px 12px; margin-bottom:10px;}
+  .agree-check{display:flex; gap:10px; align-items:flex-start; margin-top:14px; font-size:13.5px;}
+  .agree-check input{margin-top:3px; accent-color:var(--accent);}
+
+  .sig-head{display:flex; align-items:baseline; justify-content:space-between; margin-top:18px;}
+  .sig-wrap{position:relative; border:1.5px dashed var(--line); border-radius:10px; overflow:hidden;}
+  canvas.pad{display:block; width:100%; height:170px; touch-action:none; cursor:crosshair;}
+  .sig-baseline{position:absolute; left:14px; right:14px; bottom:32px; border-bottom:1.5px solid var(--line); pointer-events:none;}
+  .sig-x{position:absolute; left:14px; bottom:28px; font-family:"Fraunces", serif; font-size:15px; color:var(--muted); pointer-events:none;}
+  .sig-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; pointer-events:none; transition:opacity .15s ease;}
+  .clear-btn{background:none; border:none; color:var(--muted); font-size:12.5px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; cursor:pointer; padding:4px 2px;}
+  .clear-btn:hover{color:var(--ink);}
+
+  button.primary{font-family:inherit; font-size:15px; font-weight:600; color:var(--accent-ink); background:var(--accent); border:none; border-radius:10px; padding:14px 18px; cursor:pointer; width:100%; margin-top:20px;}
+  button.primary:disabled{opacity:.4; cursor:not-allowed;}
+  button.ghost{font-family:inherit; font-size:13.5px; font-weight:600; color:var(--ink); background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:9px 14px; cursor:pointer;}
+  button.small{font-size:12.5px; padding:6px 10px; border-radius:7px;}
+  button.danger-ghost{color:var(--danger); border-color:color-mix(in srgb, var(--danger) 40%, var(--line));}
+  a.linkout{display:block; text-align:center; text-decoration:none; font-weight:600; color:var(--accent-ink); background:var(--accent); border-radius:10px; padding:14px 18px;}
+
+  .status{font-size:13.5px; line-height:1.5; display:none; padding:12px 14px; border-radius:10px; border:1px solid var(--line); margin-top:14px;}
+  .status.show{display:block;}
+  .status.ok{color:var(--ok); border-color:color-mix(in srgb, var(--ok) 40%, var(--line));}
+  .status.err{color:var(--danger); border-color:color-mix(in srgb, var(--danger) 40%, var(--line));}
+  .status.info{color:var(--muted); border-color:var(--line);}
+
+  .success-panel{text-align:center; padding:34px 20px;}
+  .success-panel .mark{font-size:34px; margin-bottom:10px;}
+
+  .gate{max-width:340px; margin:60px auto; text-align:center;}
+  .gate input{margin-bottom:10px;}
+
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px;}
+  .toolbar input[type="text"]{max-width:260px;}
+  .count-pill{font-size:12px; color:var(--muted); background:var(--panel-2); border-radius:20px; padding:5px 12px;}
+  .table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px;}
+  table{border-collapse:collapse; width:100%; font-size:13.5px;}
+  th, td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap;}
+  th{background:var(--panel-2); font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted);}
+  tr:last-child td{border-bottom:none;}
+  td.name{font-weight:600;}
+  .empty-note{color:var(--muted); font-size:13.5px; padding:30px; text-align:center;}
+
+  .field-card{border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px; background:var(--paper);}
+  .field-card-row{display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;}
+  .field-card-row > div{flex:1; min-width:140px;}
+  .field-card-actions{display:flex; gap:6px; justify-content:space-between; align-items:center; margin-top:10px;}
+  .field-card-actions .left{display:flex; gap:6px;}
+  .req-toggle{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); font-weight:600;}
+  .req-toggle input{accent-color:var(--accent);}
+
+  footer.foot{text-align:center; font-size:12px; color:var(--muted); margin-top:30px;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="word">Wheee <span style="color:var(--accent)">/</span> Woots Events</span>
+    <span class="tag">Crew Portal</span>
+  </div>
+  <nav class="tabs">
+    <button id="tabSignBtn" class="active" data-tab="sign">Sign</button>
+    <button id="tabDataBtn" data-tab="data">Data</button>
+    <button id="tabEditBtn" data-tab="edit">Edit form</button>
+  </nav>
+</header>
+
+<main id="app"></main>
+
+<footer class="foot">Wheee / Woots Events — crew registration &amp; e-signature</footer>
+
+<script>
+(function(){
+  var ENDPOINT = "https://script.google.com/macros/s/AKfycbyqTZJFyG_hqKzdN_ABbsn3YaVMf-mKdET1vhpLo4T7QT36rx_j-kAvoYYuJtD7pluGMQ/exec";
+  var SHEET_URL = "https://docs.google.com/spreadsheets/d/1AswuqRIXr0_-LJ_J4zqq86vT71tLjroeoynBqbTrBgQ/edit?gid=0#gid=0";
+  var ADMIN_KEY_STORAGE = "wheeeCrewAdminKey";
+
+  var app = document.getElementById('app');
+  var main = document.querySelector('main');
+  var tabButtons = document.querySelectorAll('nav.tabs button');
+  var state = { tab: 'sign', config: null, rows: null };
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function getAdminKey(){ try { return localStorage.getItem(ADMIN_KEY_STORAGE) || ''; } catch(e){ return ''; } }
+  function setAdminKey(v){ try { localStorage.setItem(ADMIN_KEY_STORAGE, v); } catch(e){} }
+
+  function api(params){
+    var url = ENDPOINT + '?' + Object.keys(params).map(function(k){
+      return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+    }).join('&');
+    return fetch(url).then(function(r){ return r.json(); });
+  }
+  function apiPost(body){
+    return fetch(ENDPOINT, { method: 'POST', body: JSON.stringify(body) }).then(function(r){ return r.json(); });
+  }
+
+  function switchTab(tab){
+    state.tab = tab;
+    tabButtons.forEach(function(b){ b.classList.toggle('active', b.dataset.tab === tab); });
+    render();
+  }
+  tabButtons.forEach(function(b){ b.addEventListener('click', function(){ switchTab(b.dataset.tab); }); });
+
+  function loadConfig(){ return api({ action: 'config' }).then(function(cfg){ state.config = cfg; }); }
+
+  // ================= SIGN VIEW =================
+  function fieldInputHtml(f){
+    var reqStar = f.required ? ' <span class="req">*</span>' : '';
+    if (f.type === 'textarea'){
+      return '<label for="f_'+f.id+'">'+esc(f.label)+reqStar+'</label><textarea id="f_'+f.id+'" data-field="'+f.id+'"></textarea><div class="err-msg">Please fill this in.</div>';
+    }
+    if (f.type === 'select'){
+      var opts = '<option value="">Choose…</option>' + (f.options||[]).map(function(o){ return '<option value="'+esc(o)+'">'+esc(o)+'</option>'; }).join('');
+      return '<label for="f_'+f.id+'">'+esc(f.label)+reqStar+'</label><select id="f_'+f.id+'" data-field="'+f.id+'">'+opts+'</select><div class="err-msg">Please make a selection.</div>';
+    }
+    if (f.type === 'multiselect'){
+      var pills = (f.options||[]).map(function(o){
+        return '<label class="check-pill" data-pill><input type="checkbox" value="'+esc(o)+'" data-multi="'+f.id+'"> '+esc(o)+'</label>';
+      }).join('');
+      return '<label>'+esc(f.label)+reqStar+'</label><div class="check-grid">'+pills+'</div><div class="err-msg">Please choose at least one.</div>';
+    }
+    var type = f.type === 'tel' ? 'tel' : (f.type === 'email' ? 'email' : 'text');
+    return '<label for="f_'+f.id+'">'+esc(f.label)+reqStar+'</label><input type="'+type+'" id="f_'+f.id+'" data-field="'+f.id+'"><div class="err-msg">Please fill this in.</div>';
+  }
+
+  function renderSign(){
+    main.classList.remove('wide');
+    var cfg = state.config;
+    var fieldsHtml = (cfg.fields||[]).map(function(f){
+      return '<div class="field" data-field-wrap="'+f.id+'">'+fieldInputHtml(f)+'</div>';
+    }).join('');
+    var isPlaceholder = /Paste your Event Crew Agreement text here/.test(cfg.agreement||'');
+    var agreementFlag = isPlaceholder ? '<div class="placeholder-flag">⚠ This is placeholder text — add the real Event Crew Agreement in the Edit form tab.</div>' : '';
+
+    app.innerHTML =
+      '<div class="eyebrow">Crew Registration</div><h1>Join the crew</h1>' +
+      '<p class="lede">Fill in your details, read the crew agreement, and sign at the bottom. Takes about two minutes.</p>' +
+      '<div class="card"><h2>Your details</h2><p class="sub">We use this to plan roles, sizing, and who to call in an emergency.</p>' + fieldsHtml + '</div>' +
+      '<div class="card">' +
+        '<h2>Event Crew Agreement</h2><p class="sub">Please read before signing.</p>' + agreementFlag +
+        '<div class="agreement-box">' + esc(cfg.agreement||'') + '</div>' +
+        '<div class="agree-check"><input type="checkbox" id="agreeCheck"><label for="agreeCheck" style="text-transform:none;font-weight:400;font-size:13.5px;color:var(--ink);margin:0;">I have read and agree to the Event Crew Agreement above.</label></div>' +
+        '<div class="sig-head"><label style="margin-bottom:0;">Your signature <span class="req">*</span></label><button class="clear-btn" id="clearBtn" type="button">Clear</button></div>' +
+        '<div class="sig-wrap"><canvas class="pad" id="pad"></canvas><div class="sig-baseline"></div><div class="sig-x">×</div><div class="sig-hint" id="sigHint">sign here</div></div>' +
+        '<div class="err-msg" id="sigErr" style="display:none;">Please sign above before submitting.</div>' +
+      '</div>' +
+      '<button class="primary" id="submitBtn">Submit &amp; sign</button>' +
+      '<div class="status" id="status"></div>';
+
+    wireSignForm();
+  }
+
+  function wireSignForm(){
+    var cfg = state.config;
+    document.querySelectorAll('[data-pill]').forEach(function(pill){
+      var cb = pill.querySelector('input');
+      cb.addEventListener('change', function(){ pill.classList.toggle('checked', cb.checked); });
+    });
+
+    var canvas = document.getElementById('pad');
+    var ctx = canvas.getContext('2d');
+    var hint = document.getElementById('sigHint');
+    var clearBtn = document.getElementById('clearBtn');
+    var hasSignature = false, drawing = false, lastX = 0, lastY = 0;
+
+    function inkColor(){ return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#1c2333'; }
+    function sizeCanvas(){
+      var rect = canvas.getBoundingClientRect();
+      var dpr = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.lineWidth = 2.4; ctx.strokeStyle = inkColor();
+    }
+    sizeCanvas();
+    window.addEventListener('resize', function(){ if (!hasSignature) sizeCanvas(); });
+
+    function pos(e){ var r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+    canvas.addEventListener('pointerdown', function(e){
+      drawing = true; canvas.setPointerCapture(e.pointerId);
+      var p = pos(e); lastX = p.x; lastY = p.y; ctx.strokeStyle = inkColor();
+      if (!hasSignature){ hasSignature = true; hint.style.opacity = '0'; }
+      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(lastX+0.1, lastY+0.1); ctx.stroke();
+    });
+    canvas.addEventListener('pointermove', function(e){
+      if (!drawing) return;
+      var p = pos(e);
+      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+      lastX = p.x; lastY = p.y;
+    });
+    function stop(e){ if (!drawing) return; drawing = false; try{ canvas.releasePointerCapture(e.pointerId); }catch(err){} }
+    canvas.addEventListener('pointerup', stop);
+    canvas.addEventListener('pointercancel', stop);
+    canvas.addEventListener('pointerleave', stop);
+    clearBtn.addEventListener('click', function(){ sizeCanvas(); hasSignature = false; hint.style.opacity = '1'; });
+
+    function buildExportCanvas(nameVal, roleVal){
+      var padRect = canvas.getBoundingClientRect();
+      var scale = 2, w = 720, headerH = 92, sigH = Math.round(padRect.height * (w / padRect.width)), footH = 60;
+      var out = document.createElement('canvas');
+      out.width = w * scale; out.height = (headerH + sigH + footH) * scale;
+      var octx = out.getContext('2d');
+      octx.setTransform(scale, 0, 0, scale, 0, 0);
+      octx.fillStyle = '#faf6ee'; octx.fillRect(0, 0, w, headerH + sigH + footH);
+      octx.fillStyle = '#7a6f5e'; octx.font = '600 11px "IBM Plex Sans", sans-serif';
+      octx.fillText('WHEEE / WOOTS EVENTS — CREW AGREEMENT SIGNATURE', 24, 30);
+      octx.fillStyle = '#1c2333'; octx.font = '600 20px "Fraunces", serif';
+      octx.fillText(nameVal || '', 24, 60);
+      var dateStr = new Date().toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+      octx.fillStyle = '#7a6f5e'; octx.font = '400 13px "IBM Plex Sans", sans-serif';
+      octx.fillText((roleVal ? roleVal + '  ·  ' : '') + dateStr, 24, 80);
+      octx.strokeStyle = '#d9d0bd'; octx.lineWidth = 1;
+      octx.beginPath(); octx.moveTo(0, headerH); octx.lineTo(w, headerH); octx.stroke();
+      octx.drawImage(canvas, 24, headerH + 10, w - 48, sigH - 20);
+      octx.beginPath(); octx.moveTo(24, headerH + sigH - 6); octx.lineTo(w - 24, headerH + sigH - 6); octx.stroke();
+      octx.fillStyle = '#7a6f5e'; octx.font = '400 11px "IBM Plex Sans", sans-serif';
+      octx.fillText('Signed electronically on ' + dateStr + '.', 24, headerH + sigH + 24);
+      return out;
+    }
+
+    var statusEl = document.getElementById('status');
+    function showStatus(kind, msg){ statusEl.className = 'status show ' + kind; statusEl.textContent = msg; }
+
+    document.getElementById('submitBtn').addEventListener('click', function(){
+      var data = {}, valid = true;
+      (cfg.fields||[]).forEach(function(f){
+        var wrap = document.querySelector('[data-field-wrap="'+f.id+'"]');
+        var val;
+        if (f.type === 'multiselect'){
+          val = Array.prototype.slice.call(document.querySelectorAll('[data-multi="'+f.id+'"]:checked')).map(function(c){ return c.value; });
+          if (f.required && val.length === 0){ wrap.classList.add('invalid'); valid = false; } else { wrap.classList.remove('invalid'); }
+        } else {
+          var el = document.getElementById('f_' + f.id);
+          val = el.value.trim();
+          if (f.required && !val){ wrap.classList.add('invalid'); valid = false; } else { wrap.classList.remove('invalid'); }
+        }
+        data[f.id] = val;
+      });
+
+      var agreeOk = document.getElementById('agreeCheck').checked;
+      var sigErr = document.getElementById('sigErr');
+      var sigOk = hasSignature && agreeOk;
+      sigErr.style.display = sigOk ? 'none' : 'block';
+      sigErr.textContent = !hasSignature ? 'Please sign above before submitting.' : 'Please check the agreement box before submitting.';
+      if (!sigOk) valid = false;
+
+      if (!valid){ showStatus('err', 'Please fix the highlighted fields above.'); return; }
+
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Submitting…';
+
+      var exportCanvas = buildExportCanvas(data.fullName || '', data.role || '');
+      var sigDataUrl = exportCanvas.toDataURL('image/png');
+
+      apiPost({ action: 'submit', data: data, signature: sigDataUrl }).then(function(res){
+        if (res && res.ok){
+          app.innerHTML = '<div class="card success-panel"><div class="mark">✓</div><h2 style="font-size:20px;">You\'re all set</h2><p class="sub" style="margin-top:8px;">Thanks — your details and signature have been recorded. See you at the event!</p></div>';
+        } else {
+          showStatus('err', "Couldn't submit — please try again.");
+          btn.disabled = false; btn.textContent = 'Submit & sign';
+        }
+      }).catch(function(){
+        showStatus('err', "Couldn't reach the server — check your connection and try again.");
+        btn.disabled = false; btn.textContent = 'Submit & sign';
+      });
+    });
+  }
+
+  // ================= DATA VIEW =================
+  function renderAdminGate(onOk){
+    app.innerHTML =
+      '<div class="gate"><div class="eyebrow">Admin</div><h1 style="font-size:22px;">Enter admin key</h1>' +
+      '<p class="lede">This matches the ADMIN_KEY set in your Apps Script.</p>' +
+      '<input type="text" id="gateKey" placeholder="Admin key">' +
+      '<button class="primary" id="gateBtn" style="margin-top:4px;">Continue</button>' +
+      '<div class="status" id="gateStatus"></div></div>';
+    document.getElementById('gateKey').value = getAdminKey();
+    document.getElementById('gateBtn').addEventListener('click', function(){
+      setAdminKey(document.getElementById('gateKey').value.trim());
+      onOk();
+    });
+  }
+
+  function renderData(){
+    main.classList.add('wide');
+    var key = getAdminKey();
+    if (!key){ renderAdminGate(renderData); return; }
+    app.innerHTML = '<div class="eyebrow">Admin</div><h1>Crew data</h1><p class="lede">Loading submissions…</p>';
+    api({ action: 'list', key: key }).then(function(res){
+      if (res && res.error === 'unauthorized'){
+        setAdminKey('');
+        renderAdminGate(renderData);
+        setTimeout(function(){
+          var st = document.getElementById('gateStatus');
+          if (st){ st.className = 'status show err'; st.textContent = 'Wrong key — try again.'; }
+        }, 0);
+        return;
+      }
+      state.rows = (res && res.rows) || [];
+      drawDataTable();
+    }).catch(function(){
+      app.innerHTML = '<div class="card"><p class="sub">Couldn\'t load data. Check your connection and try again.</p></div>';
+    });
+  }
+
+  function drawDataTable(filterText){
+    var cfg = state.config;
+    var cols = (cfg.fields||[]).slice(0, 6);
+    var rows = state.rows || [];
+    var ft = (filterText||'').toLowerCase();
+    var filtered = !ft ? rows : rows.filter(function(r){ return JSON.stringify(r.data).toLowerCase().indexOf(ft) !== -1; });
+
+    var head = '<tr><th>Submitted</th>' + cols.map(function(c){ return '<th>'+esc(c.label)+'</th>'; }).join('') + '<th>Signature</th></tr>';
+    var body = filtered.map(function(r){
+      var when = r.timestamp ? new Date(r.timestamp).toLocaleString() : '';
+      var cells = cols.map(function(c){
+        var v = r.data ? r.data[c.id] : '';
+        if (Array.isArray(v)) v = v.join(', ');
+        return '<td' + (c.id === 'fullName' ? ' class="name"' : '') + '>' + esc(v) + '</td>';
+      }).join('');
+      var sig = r.signatureUrl ? '<a href="'+esc(r.signatureUrl)+'" target="_blank" rel="noopener">View</a>' : '—';
+      return '<tr>' + '<td>'+esc(when)+'</td>' + cells + '<td>'+sig+'</td>' + '</tr>';
+    }).join('');
+
+    var tableHtml = filtered.length
+      ? '<div class="table-wrap"><table><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'
+      : '<div class="table-wrap"><div class="empty-note">No submissions yet.</div></div>';
+
+    app.innerHTML =
+      '<div class="eyebrow">Admin</div><h1>Crew data</h1>' +
+      '<p class="lede">Every crew member who has signed up and signed the agreement.</p>' +
+      '<div class="toolbar">' +
+        '<input type="text" id="filterInput" placeholder="Search name, project, role…">' +
+        '<span class="count-pill">'+filtered.length+' of '+rows.length+'</span>' +
+        '<button class="ghost small" id="refreshBtn">Refresh</button>' +
+        (SHEET_URL ? '<a class="ghost small" href="'+esc(SHEET_URL)+'" target="_blank" rel="noopener" style="text-decoration:none;">Open Sheet ↗</a>' : '') +
+      '</div>' + tableHtml;
+
+    document.getElementById('filterInput').value = filterText || '';
+    document.getElementById('filterInput').addEventListener('input', function(e){ drawDataTable(e.target.value); });
+    document.getElementById('refreshBtn').addEventListener('click', function(){ renderData(); });
+  }
+
+  // ================= EDIT VIEW =================
+  var TYPE_OPTIONS = [
+    ['text','Short text'], ['tel','Phone'], ['email','Email'],
+    ['textarea','Long text'], ['select','Dropdown (one choice)'], ['multiselect','Checkboxes (multiple)']
+  ];
+
+  function renderEdit(){
+    main.classList.remove('wide');
+    var key = getAdminKey();
+    if (!key){ renderAdminGate(renderEdit); return; }
+    drawEdit(JSON.parse(JSON.stringify(state.config)));
+  }
+
+  function slugify(label, existing){
+    var base = String(label).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'field';
+    var id = base, n = 1;
+    while (existing.indexOf(id) !== -1){ id = base + '_' + (++n); }
+    return id;
+  }
+
+  function drawEdit(cfg){
+    var fieldsHtml = cfg.fields.map(function(f, i){
+      var typeOpts = TYPE_OPTIONS.map(function(t){
+        return '<option value="'+t[0]+'"'+(f.type===t[0]?' selected':'')+'>'+t[1]+'</option>';
+      }).join('');
+      var showOptions = (f.type === 'select' || f.type === 'multiselect');
+      return '' +
+        '<div class="field-card" data-idx="'+i+'">' +
+          '<div class="field-card-row">' +
+            '<div><label>Label</label><input type="text" data-edit="label" value="'+esc(f.label)+'"></div>' +
+            '<div><label>Type</label><select data-edit="type">'+typeOpts+'</select></div>' +
+          '</div>' +
+          '<div class="field-card-row" data-opts-row style="'+(showOptions?'':'display:none;')+'">' +
+            '<div><label>Options (comma separated)</label><input type="text" data-edit="options" value="'+esc((f.options||[]).join(', '))+'"></div>' +
+          '</div>' +
+          '<div class="field-card-actions">' +
+            '<label class="req-toggle"><input type="checkbox" data-edit="required" '+(f.required?'checked':'')+'> Required</label>' +
+            '<div class="left">' +
+              '<button class="ghost small" data-act="up" type="button">↑</button>' +
+              '<button class="ghost small" data-act="down" type="button">↓</button>' +
+              '<button class="ghost small danger-ghost" data-act="remove" type="button">Remove</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+
+    app.innerHTML =
+      '<div class="eyebrow">Admin</div><h1>Edit the form</h1>' +
+      '<p class="lede">Changes apply the next time someone opens the Sign tab.</p>' +
+      '<div class="card"><h2>Crew questions</h2><p class="sub">What every crew member fills in before signing.</p>' +
+        '<div id="fieldList">' + fieldsHtml + '</div>' +
+        '<button class="ghost" id="addFieldBtn" type="button" style="margin-top:6px;">+ Add question</button>' +
+      '</div>' +
+      '<div class="card"><h2>Event Crew Agreement</h2><p class="sub">Shown above the signature pad.</p>' +
+        '<textarea id="agreementText" style="min-height:180px;">'+esc(cfg.agreement||'')+'</textarea>' +
+      '</div>' +
+      '<button class="primary" id="saveConfigBtn">Save changes</button>' +
+      '<div class="status" id="editStatus"></div>';
+
+    function readCfgFromDom(){
+      var cards = document.querySelectorAll('.field-card');
+      var ids = cfg.fields.map(function(f){ return f.id; });
+      var fields = Array.prototype.map.call(cards, function(card, i){
+        var orig = cfg.fields[i] || {};
+        var label = card.querySelector('[data-edit="label"]').value.trim() || 'Untitled question';
+        var type = card.querySelector('[data-edit="type"]').value;
+        var required = card.querySelector('[data-edit="required"]').checked;
+        var id = orig.id || slugify(label, ids);
+        var f = { id: id, label: label, type: type, required: required };
+        if (type === 'select' || type === 'multiselect'){
+          var optsRaw = card.querySelector('[data-edit="options"]').value;
+          f.options = optsRaw.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+        }
+        return f;
+      });
+      return { fields: fields, agreement: document.getElementById('agreementText').value };
+    }
+
+    document.getElementById('fieldList').addEventListener('change', function(e){
+      if (e.target.dataset.edit === 'type'){
+        var card = e.target.closest('.field-card');
+        var row = card.querySelector('[data-opts-row]');
+        row.style.display = (e.target.value === 'select' || e.target.value === 'multiselect') ? '' : 'none';
+      }
+    });
+
+    document.getElementById('fieldList').addEventListener('click', function(e){
+      var btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      cfg = readCfgFromDom();
+      var idx = Array.prototype.indexOf.call(document.querySelectorAll('.field-card'), btn.closest('.field-card'));
+      if (btn.dataset.act === 'remove'){ cfg.fields.splice(idx, 1); }
+      if (btn.dataset.act === 'up' && idx > 0){ var tmp = cfg.fields[idx-1]; cfg.fields[idx-1] = cfg.fields[idx]; cfg.fields[idx] = tmp; }
+      if (btn.dataset.act === 'down' && idx < cfg.fields.length - 1){ var tmp2 = cfg.fields[idx+1]; cfg.fields[idx+1] = cfg.fields[idx]; cfg.fields[idx] = tmp2; }
+      drawEdit(cfg);
+    });
+
+    document.getElementById('addFieldBtn').addEventListener('click', function(){
+      cfg = readCfgFromDom();
+      cfg.fields.push({ id: slugify('New question ' + (cfg.fields.length+1), cfg.fields.map(function(f){return f.id;})), label: 'New question', type: 'text', required: false });
+      drawEdit(cfg);
+    });
+
+    document.getElementById('saveConfigBtn').addEventListener('click', function(){
+      var newCfg = readCfgFromDom();
+      var btn = document.getElementById('saveConfigBtn');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      apiPost({ action: 'saveConfig', key: getAdminKey(), config: newCfg }).then(function(res){
+        var st = document.getElementById('editStatus');
+        if (res && res.ok){
+          state.config = newCfg;
+          st.className = 'status show ok'; st.textContent = 'Saved. Crew members will see these changes next time they open the Sign tab.';
+        } else {
+          st.className = 'status show err'; st.textContent = res && res.error === 'unauthorized' ? 'Wrong admin key.' : "Couldn't save — please try again.";
+        }
+        btn.disabled = false; btn.textContent = 'Save changes';
+      }).catch(function(){
+        var st = document.getElementById('editStatus');
+        st.className = 'status show err'; st.textContent = "Couldn't reach the server.";
+        btn.disabled = false; btn.textContent = 'Save changes';
+      });
+    });
+  }
+
+  // ================= ROUTER =================
+  function render(){
+    if (!state.config){ app.innerHTML = '<p class="lede" style="margin-top:40px;text-align:center;">Loading…</p>'; return; }
+    if (state.tab === 'sign') renderSign();
+    else if (state.tab === 'data') renderData();
+    else if (state.tab === 'edit') renderEdit();
+  }
+
+  loadConfig().then(render).catch(function(){
+    app.innerHTML = '<div class="card"><h2>Couldn\'t load the form</h2><p class="sub">Please check your connection and reload the page.</p></div>';
+  });
+})();
+</script>
+</body>
+</html>
