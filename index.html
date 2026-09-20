@@ -8,20 +8,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Work+Sans:wght@400;500;600&display=swap">
 <style>
   :root{
-    --ink:#09263d; --ink-soft:#1c4668; --paper:#f6f4eb; --panel:#ffffff; --panel-2:#efe9d8;
+    --ink:#000000; --headline:#09263d; --subheadline:#970a44; --paper:#ffffff; --panel:#ffffff; --panel-2:#efefef;
     --accent:#FFE549; --accent-ink:#3d3200; --accent-2:#EBA040;
     --maroon:#970a44; --maroon-deep:#720632;
     --line:#ddd6c2; --muted:#5c6b78; --danger:#b23c22; --ok:#2f7d4f;
     font-family:"Work Sans", system-ui, sans-serif;
   }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --ink:#f1ece0; --ink-soft:#c9d6e0; --paper:#111417; --panel:#191d22; --panel-2:#20252b;
-      --accent:#FFE549; --accent-ink:#3d3200; --accent-2:#f0ae55;
-      --maroon:#ff6f9e; --maroon-deep:#ff8fb3;
-      --line:#333a42; --muted:#93a0ab; --danger:#ff8a6b; --ok:#5fcf8a;
-    }
-  }
+  /* Fixed white theme by design — intentionally no automatic dark mode. */
   *{box-sizing:border-box;}
   body{background:var(--paper); color:var(--ink); margin:0; padding-inline:16px; padding-block:0 40px;}
   a{color:var(--maroon);}
@@ -46,11 +39,11 @@
   main.wide{max-width:1000px;}
 
   .eyebrow{font-size:12px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--maroon);}
-  h1.page-title{font-weight:700; font-size:clamp(24px,5.5vw,30px); line-height:1.15; margin:6px 0 8px;}
+  h1.page-title{font-weight:700; font-size:clamp(24px,5.5vw,30px); line-height:1.15; margin:6px 0 8px; color:var(--headline);}
   p.lede{margin:0 0 22px; color:var(--muted); font-size:14.5px; line-height:1.55;}
 
   .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; margin-bottom:18px;}
-  .card h2{font-size:17px; font-weight:700; margin:0 0 4px;}
+  .card h2{font-size:17px; font-weight:700; margin:0 0 4px; color:var(--subheadline);}
   .card .sub{font-size:12.5px; color:var(--muted); margin:0 0 16px;}
 
   label{display:block; font-size:12.5px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;}
@@ -64,7 +57,7 @@
   }
   textarea{resize:vertical; min-height:72px;}
   input:focus, textarea:focus, select:focus{border-color:var(--maroon);}
-  .req{color:var(--maroon);}
+  .req{color:var(--accent-2);}
   .check-grid{display:flex; flex-wrap:wrap; gap:8px;}
   .check-pill{display:flex; align-items:center; gap:6px; border:1.5px solid var(--line); border-radius:20px; padding:7px 13px; font-size:13.5px; cursor:pointer; user-select:none;}
   .check-pill input{accent-color:var(--maroon);}
@@ -137,7 +130,7 @@
   td.name{font-weight:600;}
   .empty-note{color:var(--muted); font-size:13.5px; padding:30px; text-align:center;}
 
-  .section-heading{font-family:"Poppins",sans-serif; font-weight:700; font-size:19px; margin:26px 0 10px;}
+  .section-heading{font-family:"Poppins",sans-serif; font-weight:700; font-size:19px; margin:26px 0 10px; color:var(--subheadline);}
   .section-heading:first-child{margin-top:0;}
 
   .field-card{border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px; background:var(--paper);}
