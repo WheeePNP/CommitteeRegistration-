@@ -507,7 +507,10 @@
     var nameField = document.getElementById('f_fullName');
     var metaName = document.getElementById('metaName');
     var metaDate = document.getElementById('metaDate');
-    var todayStr = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    // Fixed locale (not the visitor's own device language) so this is always
+    // plain Latin text — the signed PDF is stamped with a standard font that
+    // can only encode Latin-1/Windows-1252 characters, e.g. not "2026年9月22日".
+    var todayStr = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
     metaDate.textContent = todayStr;
     if (nameField){
       var syncName = function(){ metaName.textContent = nameField.value.trim() || '—'; };
@@ -708,6 +711,14 @@
     }
   }
 
+  // The standard PDF font used below can only encode Latin-1/Windows-1252
+  // (WinAnsi) characters. Replace anything outside that range (CJK, emoji,
+  // etc. — e.g. from a name typed in Chinese) so a signed PDF can never fail
+  // to generate; visible on-screen text elsewhere in the form is untouched.
+  function sanitizeForPdfText(str){
+    return String(str || '').replace(/[^\x00-\xFF]/g, '?');
+  }
+
   function buildSignedAgreementPdf(signatureCanvas, fullName, dateStr){
     return fetch(AGREEMENT_PDF_URL).then(function(r){ return r.arrayBuffer(); }).then(function(bytes){
       return PDFLib.PDFDocument.load(bytes);
@@ -719,8 +730,8 @@
           var page = pages[pages.length - 1];
           var P = SIG_PLACEMENT;
           page.drawImage(sigImage, { x: P.signature.x, y: P.signature.y, width: P.signature.width, height: P.signature.height });
-          page.drawText(fullName || '', { x: P.fullName.x, y: P.fullName.y, size: P.fullName.size, font: font, color: PDFLib.rgb(0.03,0.07,0.15) });
-          page.drawText(dateStr || '', { x: P.date.x, y: P.date.y, size: P.date.size, font: font, color: PDFLib.rgb(0.03,0.07,0.15) });
+          page.drawText(sanitizeForPdfText(fullName), { x: P.fullName.x, y: P.fullName.y, size: P.fullName.size, font: font, color: PDFLib.rgb(0.03,0.07,0.15) });
+          page.drawText(sanitizeForPdfText(dateStr), { x: P.date.x, y: P.date.y, size: P.date.size, font: font, color: PDFLib.rgb(0.03,0.07,0.15) });
           return pdfDoc.save();
         });
       });
